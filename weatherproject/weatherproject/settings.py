@@ -31,6 +31,11 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
+CSRF_TRUSTED_ORIGINS = [
+    "https://localhost:8000",
+    # if you also hit 127.0.0.1:
+    "https://127.0.0.1:8000",
+]
 
 # Application definition
 

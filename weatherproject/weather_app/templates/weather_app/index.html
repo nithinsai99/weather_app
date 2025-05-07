@@ -16,7 +16,7 @@
 
     <div class="container">
         <h1>
-            Weather App
+            AI Weather App
         </h1>
 
         <form method="POST">
@@ -35,6 +35,21 @@
                     <p><img src=" https://openweathermap.org/img/wn/{{ icon }}@2x.png"></p>
                 </div>
             </div>
+        </div>
+
+        <div class="info">
+            <div class="info-header">
+                {% if exception_occurred %}
+                Information about city not available
+                {% else %}
+                Information about {{ city }}
+                {% endif %} 
+            </div>
+            <p>
+                <b>
+                    {{info}}
+                </b>
+            </p>
         </div>
     </div>
 

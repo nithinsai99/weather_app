@@ -2,6 +2,7 @@ from django.shortcuts import render, HttpResponse
 from . import templates
 import requests, datetime, os
 from django.contrib import messages
+import google.generativeai as genai
 
 def home(request):
     if 'city' in request.POST:
@@ -14,6 +15,12 @@ def home(request):
 
     SEARCH_API_KEY = os.environ.get('SEARCH_API_KEY')
     SEARCH_ENGINE_ID = os.environ.get('SEARCH_ENGINE_ID')
+    GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY')
+
+    genai.configure(api_key=GEMINI_API_KEY)
+    model = genai.GenerativeModel("gemini-2.0-flash")
+    response = model.generate_content(f"what is special about {city} in a single line")
+    print(type(response))
 
     query = city + "city 1920x1080"
     page = 1
@@ -21,12 +28,13 @@ def home(request):
     searchType = 'image'
 
     city_url = f"https://www.googleapis.com/customsearch/v1?key={SEARCH_API_KEY}&cx={SEARCH_ENGINE_ID}&q={query}&start={start}&searchType={searchType}&imgSize=xlarge"
-    data = requests.get(city_url).json()
-    search_items = data.get("items")
-    image_url = search_items[1]['link']
-    print(city)
+    
 
     try:
+        data = requests.get(city_url).json()
+        search_items = data.get("items")
+        image_url = search_items[1]['link']
+        print(city)
         data = requests.get(url,PARAMS).json()
         description = data['weather'][0]['description']
         icon = data['weather'][0]['icon']
@@ -34,7 +42,7 @@ def home(request):
         day = datetime.date.today()
 
 
-        return render(request, 'weather_app/index.html', {'description':description, 'icon':icon, 'temp':temp, 'day':day, 'city':city, 'exception_occured':False, 'image_url':image_url})
+        return render(request, 'weather_app/index.html', {'description':description, 'icon':icon, 'temp':temp, 'day':day, 'city':city, 'exception_occured':False, 'image_url':image_url, 'info':response.text})
     except:
         exception_occured = True
         messages.error(request, 'Data is Not Available')
